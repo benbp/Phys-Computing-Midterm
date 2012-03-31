@@ -1,44 +1,3 @@
-#include <FatReader.h>
-#include <SdReader.h>
-#include <avr/pgmspace.h>
-#include "WaveUtil.h"
-#include "WaveHC.h"
-
-
-SdReader card;    // This object holds the information for the card
-FatVolume vol;    // This holds the information for the partition on the card
-FatReader root;   // This holds the information for the filesystem on the card
-FatReader f;      // This holds the information for the file we're play
-
-WaveHC wave;      // This is the only wave (audio) object, since we will only play one at a time
-
-#define DEBOUNCE 100  // button debouncer
-
-// this handy function will return the number of bytes currently free in RAM, great for debugging!   
-int freeRam(void)
-{
-  extern int  __bss_end; 
-  extern int  *__brkval; 
-  int free_memory; 
-  if((int)__brkval == 0) {
-    free_memory = ((int)&free_memory) - ((int)&__bss_end); 
-  }
-  else {
-    free_memory = ((int)&free_memory) - ((int)__brkval); 
-  }
-  return free_memory; 
-} 
-
-void sdErrorCheck(void)
-{
-  if (!card.errorCode()) return;
-  putstring("\n\rSD I/O error: ");
-  Serial.print(card.errorCode(), HEX);
-  putstring(", ");
-  Serial.println(card.errorData(), HEX);
-  while(1);
-}
-
 
 // motion sensor
 int pirPin = 0;
@@ -47,7 +6,10 @@ int counter = 0;
 unsigned long time = 0;
 
 // for PIR sensor Serial debugging
-int calibrationTime = 10;
+int calibrationTime = 2;
+
+// for debugging/communication to other arduino
+
 
 const int BUTTON = 12;
 const int LED = 13;
