@@ -47,7 +47,13 @@ unsigned long time = 0;
 
 // for PIR sensor Serial debugging
 int calibrationTime = 10;
+boolean ledstate = 0;
+
+// for debugging/communication to other arduino
 int LED = 13;
+
+int BUTTON = 12;
+
 
 void setup() {
   // set up serial port
@@ -64,6 +70,7 @@ void setup() {
   pinMode(5, OUTPUT);
  
   pinMode(pirPin, INPUT);
+  pinMode(BUTTON, INPUT);
  
   //  if (!card.init(true)) { //play with 4 MHz spi if 8MHz isn't working for you
   if (!card.init()) {         //play with 8 MHz spi (default faster!)  
@@ -117,24 +124,39 @@ void setup() {
 }
 
 void loop() {
-  //putstring("."); // uncomment this to see if the loop isnt running
-
+	
+	int val = analogRead(pirPin);
 // if there is motion, play a file --> value in the while loop untested
-	if(analogRead(pirPin) > 50 && (millis() - time) > 3000 && !wave.isplaying) {
+	if(analogRead(pirPin) > 100 && (millis() - time) > 3000 && !wave.isplaying) {
   		choose_tweet(int(random(1,8)));
 		counter++;
 		
-		digitalWrite(LED, HIGH);
-		Serial.print("on");
+		// for debugging/communication to other arduino
+		ledstate = 1;
+		Serial.print(val);
+		Serial.print("FREQ");
+		Serial.print("\n"); 
 	}
-	
-	if(analogRead(pirPin) < 50 && (millis() - time) > 60000 && !wave.isplaying) {
+
+	if(analogRead(pirPin) < 100 && (millis() - time) > 60000 && !wave.isplaying) {
 		choose_tweet(int(random(1,8)));
 		counter = 0;
-		
-		digitalWrite(LED, LOW);
-		Serial.print("off");
+				
+		// for debugging/communication to other arduino
+		ledstate = 0;
+		Serial.print("ONE MINUTE");
+		Serial.print("\n");
 	}
+
+	
+	// for debugging/communication to other arduino
+	if(ledstate == 0){
+		digitalWrite(LED, LOW);
+	} else {
+		digitalWrite(LED, HIGH);
+	}
+		
+	if(digitalRead(BUTTON) == HIGH){}
 }
 
 void choose_tweet(int i){
