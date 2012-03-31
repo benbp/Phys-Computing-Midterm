@@ -2,11 +2,16 @@
 
 Servo dropperServo;
 
+const int BLOWUPBUTTON = 13;
 const int PIR = 0;
+int blowupCounter = 0;
 unsigned long time = 0;
 int motion;
 int calibrationTime = 10;
 const int LED = 8;
+
+const int BUTTONLED1 = 12;
+const int BUTTONLED2 = 11;
 
 void setup(){
 	Serial.begin(9600);
@@ -36,14 +41,14 @@ void setup(){
 void loop(){
 	motion = analogRead(PIR);
 	
-	if(motion > 150 && (millis() - time) > 3000){
+	if(motion > 200 && (millis() - time) > 3000){
+		blowupCounter++;
 		drop_tweet();
 		time = millis();
 	}
 	
-	if(motion < 150 && millis() - time > 15000){
-		drop_tweet();
-		time = millis();
+	if(millis() - time > 15000){
+		blowupCounter = 0;
 	}
 
 }
