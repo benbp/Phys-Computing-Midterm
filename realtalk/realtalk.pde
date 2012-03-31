@@ -47,12 +47,13 @@ unsigned long time = 0;
 
 // for PIR sensor Serial debugging
 int calibrationTime = 10;
-boolean ledstate = 0;
 
 // for debugging/communication to other arduino
-int LED = 13;
 
-int BUTTON = 12;
+
+const int BUTTON = 12;
+const int LED = 13;
+boolean ledstate = false;
 
 
 void setup() {
@@ -68,9 +69,11 @@ void setup() {
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
+  pinMode(LED, OUTPUT);
  
   pinMode(pirPin, INPUT);
   pinMode(BUTTON, INPUT);
+
  
   //  if (!card.init(true)) { //play with 4 MHz spi if 8MHz isn't working for you
   if (!card.init()) {         //play with 8 MHz spi (default faster!)  
@@ -109,8 +112,6 @@ void setup() {
   // Whew! We got past the tough parts.
   putstring_nl("Ready!");
 
-  // For PIR sensor Serial debugging
-  pinMode(LED, OUTPUT);
 
   //give the sensor some time to calibrate
   Serial.print("calibrating sensor ");
@@ -132,9 +133,11 @@ void loop() {
 		counter++;
 		
 		// for debugging/communication to other arduino
-		ledstate = 1;
+
+		ledstate = true;
 		Serial.print(val);
-		Serial.print("FREQ");
+		Serial.print("  FREQUENT MODE, COUNTER: ");
+        Serial.print(counter);
 		Serial.print("\n"); 
 	}
 
@@ -143,17 +146,20 @@ void loop() {
 		counter = 0;
 				
 		// for debugging/communication to other arduino
-		ledstate = 0;
-		Serial.print("ONE MINUTE");
+		ledstate = false;
+		Serial.print("  INFREQUENT MODE, COUNTER: ");
+		Serial.print(counter);
 		Serial.print("\n");
 	}
-
-	
-	// for debugging/communication to other arduino
-	if(ledstate == 0){
-		digitalWrite(LED, LOW);
-	} else {
+		
+	if(ledstate == true){
 		digitalWrite(LED, HIGH);
+		Serial.print("LED ON");
+		Serial.print("\n");
+	} else {
+		Serial.print("LED OFF");
+		Serial.print("\n");
+		digitalWrite(LED, LOW);
 	}
 		
 	if(digitalRead(BUTTON) == HIGH){}
@@ -180,4 +186,3 @@ void play_tweet(char *file) {
   }
   time = millis();
 }
-
