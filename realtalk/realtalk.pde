@@ -39,13 +39,22 @@ void sdErrorCheck(void)
   while(1);
 }
 
+// motion sensor
+int pirPin = 0;
 // counter for increasing volume/distortion
 int counter = 0;
 unsigned long time = 0;
 
+// for PIR sensor Serial debugging
+int calibrationTime = 10;
+
+// for debugging/communication to other arduino
+
+
 const int BUTTON = 12;
 const int LED = 13;
-const int PRES = 0;
+boolean ledstate = false;
+
 
 void setup() {
   // set up serial port
@@ -61,8 +70,9 @@ void setup() {
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(LED, OUTPUT);
+ 
+  pinMode(pirPin, INPUT);
   pinMode(BUTTON, INPUT);
-  pinMode(PRES, INPUT);
 
  
   //  if (!card.init(true)) { //play with 4 MHz spi if 8MHz isn't working for you
@@ -102,33 +112,57 @@ void setup() {
   // Whew! We got past the tough parts.
   putstring_nl("Ready!");
 
+
+  //give the sensor some time to calibrate
+  Serial.print("calibrating sensor ");
+    for(int i = 0; i < calibrationTime; i++){
+      Serial.print(".");
+      delay(1000);
+      }
+    Serial.println(" done");
+    Serial.println("SENSOR ACTIVE");
+    delay(50);
+}
+
 void loop() {
-	val = analogRead(PRES);
 	
+	int val = analogRead(pirPin);
 // if there is motion, play a file --> value in the while loop untested
-	if(val > 200 && (millis() - time) && !wave.isplaying) {
+	if(analogRead(pirPin) > 100 && (millis() - time) > 3000 && !wave.isplaying) {
   		choose_tweet(int(random(1,8)));
 		counter++;
 		
+		// for debugging/communication to other arduino
+
+		ledstate = true;
 		Serial.print(val);
 		Serial.print("  FREQUENT MODE, COUNTER: ");
         Serial.print(counter);
 		Serial.print("\n"); 
 	}
 
-	if(val < 200 && (millis() - time) > 60000 && !wave.isplaying) {
+	if(analogRead(pirPin) < 100 && (millis() - time) > 60000 && !wave.isplaying) {
 		choose_tweet(int(random(1,8)));
 		counter = 0;
 				
-		Serial.print(val);
+		// for debugging/communication to other arduino
+		ledstate = false;
 		Serial.print("  INFREQUENT MODE, COUNTER: ");
 		Serial.print(counter);
 		Serial.print("\n");
 	}
 		
-	if(digitalRead(BUTTON) == HIGH && counter >= 15){
-		while(1){};
+	if(ledstate == true){
+		digitalWrite(LED, HIGH);
+		Serial.print("LED ON");
+		Serial.print("\n");
+	} else {
+		Serial.print("LED OFF");
+		Serial.print("\n");
+		digitalWrite(LED, LOW);
 	}
+		
+	if(digitalRead(BUTTON) == HIGH){}
 }
 
 void choose_tweet(int i){
