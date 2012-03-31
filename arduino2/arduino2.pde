@@ -50,12 +50,7 @@ void loop(){
 	if(millis() - time > 15000){
 		blowupCounter = 0;
 	}
-	
-	is_blowup();
-	
-	if(digitalRead(BLOWUPBUTTON) == HIGH){
-		blowup();
-	}
+
 }
 
 void drop_tweet(){
@@ -63,25 +58,6 @@ void drop_tweet(){
 	delay(500);
 	dropperServo.write(90);
 	signal_bird();
-}
-
-void is_blowup(){
-	if(blowupCounter >= 15){
-		digitalWrite(BUTTONLED1, HIGH);
-		digitalWrite(BUTTONLED2, HIGH);
-		delay(500);
-		digitalWrite(BUTTONLED1, LOW);
-		digitalWrite(BUTTONLED2, LOW);
-		delay(200);
-	} else {
-		digitalWrite(BUTTONLED1, LOW);
-		digitalWrite(BUTTONLED2, LOW);
-	}
-	
-}
-
-void blowup(){
-	// insert function to pour out contents of the box here
 }
 
 void signal_bird(){
