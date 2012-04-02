@@ -14,6 +14,10 @@ WaveHC wave;      // This is the only wave (audio) object, since we will only pl
 
 #define DEBOUNCE 100  // button debouncer
 
+unsigned long time = 0;
+const int PRES = 0;
+int light;
+
 // this handy function will return the number of bytes currently free in RAM, great for debugging!   
 int freeRam(void)
 {
@@ -39,10 +43,6 @@ void sdErrorCheck(void)
   while(1);
 }
 
-unsigned long time = 0;
-
-const int PRES = 0;
-int light;
 
 void setup() {
   // set up serial port
@@ -97,12 +97,16 @@ void setup() {
   
   // Whew! We got past the tough parts.
   putstring_nl("Ready!");
+
+  randomSeed(analogRead(1));
 }
 
 void loop() {
 	light = analogRead(PRES);
+	Serial.print(light);
+	Serial.print("\n");
 	
-	if(light > 200 && !wave.isplaying) {
+	if(light > 80 && !wave.isplaying) {
   		choose_tweet(int(random(1,21)));
 	}
 
