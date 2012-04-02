@@ -39,22 +39,10 @@ void sdErrorCheck(void)
   while(1);
 }
 
-// motion sensor
-int pirPin = 0;
-// counter for increasing volume/distortion
-int counter = 0;
 unsigned long time = 0;
 
-// for PIR sensor Serial debugging
-int calibrationTime = 10;
-
-// for debugging/communication to other arduino
-
-
-const int BUTTON = 12;
-const int LED = 13;
-boolean ledstate = false;
-
+const int PRES = 0;
+int light;
 
 void setup() {
   // set up serial port
@@ -69,10 +57,7 @@ void setup() {
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5, OUTPUT);
-  pinMode(LED, OUTPUT);
- 
-  pinMode(pirPin, INPUT);
-  pinMode(BUTTON, INPUT);
+  pinMode(PRES, INPUT);
 
  
   //  if (!card.init(true)) { //play with 4 MHz spi if 8MHz isn't working for you
@@ -88,9 +73,10 @@ void setup() {
 // Now we will look for a FAT partition!
   uint8_t part;
   for (part = 0; part < 5; part++) {     // we have up to 5 slots to look in
-    if (vol.init(card, part)) 
+    if (vol.init(card, part))
       break;                             // we found one, lets bail
   }
+
   if (part == 5) {                       // if we ended up not finding one  :(
     putstring_nl("No valid FAT partition!");
     sdErrorCheck();      // Something went wrong, lets print out why
@@ -111,58 +97,15 @@ void setup() {
   
   // Whew! We got past the tough parts.
   putstring_nl("Ready!");
-
-
-  //give the sensor some time to calibrate
-  Serial.print("calibrating sensor ");
-    for(int i = 0; i < calibrationTime; i++){
-      Serial.print(".");
-      delay(1000);
-      }
-    Serial.println(" done");
-    Serial.println("SENSOR ACTIVE");
-    delay(50);
 }
 
 void loop() {
+	light = analogRead(PRES);
 	
-	int val = analogRead(pirPin);
-// if there is motion, play a file --> value in the while loop untested
-	if(analogRead(pirPin) > 100 && (millis() - time) > 3000 && !wave.isplaying) {
-  		choose_tweet(int(random(1,8)));
-		counter++;
-		
-		// for debugging/communication to other arduino
-
-		ledstate = true;
-		Serial.print(val);
-		Serial.print("  FREQUENT MODE, COUNTER: ");
-        Serial.print(counter);
-		Serial.print("\n"); 
+	if(light > 200 && !wave.isplaying) {
+  		choose_tweet(int(random(1,21)));
 	}
 
-	if(analogRead(pirPin) < 100 && (millis() - time) > 60000 && !wave.isplaying) {
-		choose_tweet(int(random(1,8)));
-		counter = 0;
-				
-		// for debugging/communication to other arduino
-		ledstate = false;
-		Serial.print("  INFREQUENT MODE, COUNTER: ");
-		Serial.print(counter);
-		Serial.print("\n");
-	}
-		
-	if(ledstate == true){
-		digitalWrite(LED, HIGH);
-		Serial.print("LED ON");
-		Serial.print("\n");
-	} else {
-		Serial.print("LED OFF");
-		Serial.print("\n");
-		digitalWrite(LED, LOW);
-	}
-		
-	if(digitalRead(BUTTON) == HIGH){}
 }
 
 void choose_tweet(int i){
@@ -174,6 +117,19 @@ void choose_tweet(int i){
 	    case 5: play_tweet("5.WAV"); break;
 	    case 6: play_tweet("6.WAV"); break;
 	    case 7: play_tweet("7.WAV"); break;
+		case 8: play_tweet("8.WAV"); break;
+		case 9: play_tweet("9.WAV"); break;
+		case 10: play_tweet("10.WAV"); break;
+		case 11: play_tweet("11.WAV"); break;
+		case 12: play_tweet("12.WAV"); break;
+		case 13: play_tweet("13.WAV"); break;
+		case 14: play_tweet("14.WAV"); break;
+		case 15: play_tweet("15.WAV"); break;
+		case 16: play_tweet("16.WAV"); break;
+		case 17: play_tweet("17.WAV"); break;
+		case 18: play_tweet("18.WAV"); break;
+		case 19: play_tweet("19.WAV"); break;
+		case 20: play_tweet("20.WAV"); break;
 	}
 }
 
@@ -184,5 +140,4 @@ void play_tweet(char *file) {
 
   while (wave.isplaying){
   }
-  time = millis();
 }
