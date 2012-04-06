@@ -106,7 +106,7 @@ void loop() {
 	Serial.print(light);
 	Serial.print("\n");
 	
-	if(light > 80 && !wave.isplaying) {
+	if(light > 50 && !wave.isplaying) {
   		choose_tweet(int(random(1,21)));
 	}
 

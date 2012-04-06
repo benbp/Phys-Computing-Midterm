@@ -34,12 +34,12 @@ void loop(){
 	Serial.print(motion);
 	Serial.print("\n");
 	
-	if(motion > 150 && (millis() - time) > 3000){
+	if(motion > 60 && (millis() - time) > 3000){
 		drop_tweet();
 		time = millis();
 	}
 	
-	if(motion < 150 && millis() - time > 45000){
+	if(motion < 60 && millis() - time > 30000){
 		drop_tweet();
 		time = millis();
 	}
@@ -48,9 +48,12 @@ void loop(){
 
 void drop_tweet(){
 	signal_bird();
-	switch(servoCounter){
-		case 0: dropperServo.write(179); servoCounter++; delay(300); Serial.print("servo 179"); Serial.print("\n"); break;
-		case 1: dropperServo.write(90); servoCounter--; delay(300); Serial.print("servo 90"); Serial.print("\n"); break;
+	
+	if(motion > 60){
+		switch(servoCounter){
+			case 0: dropperServo.write(179); servoCounter++; delay(300); Serial.print("servo 179"); Serial.print("\n"); break;
+			case 1: dropperServo.write(90); servoCounter--; delay(300); Serial.print("servo 90"); Serial.print("\n"); break;
+		}
 	}
 }
 
@@ -58,5 +61,5 @@ void signal_bird(){
 	digitalWrite(LED, HIGH);
 	delay(2000);
 	digitalWrite(LED, LOW);
-	delay(2000);
+	delay(3000);
 }
